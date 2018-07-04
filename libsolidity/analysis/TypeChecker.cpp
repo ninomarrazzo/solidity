@@ -1056,7 +1056,6 @@ void TypeChecker::endVisit(EmitStatement const& _emit)
 
 bool TypeChecker::visit(VariableDeclarationStatement const& _statement)
 {
-	bool const v050 = m_scope->sourceUnit().annotation().experimentalFeatures.count(ExperimentalFeature::V050);
 	if (!_statement.initialValue())
 	{
 		// No initial value is only permitted for single variables with specified type.
@@ -1095,80 +1094,28 @@ bool TypeChecker::visit(VariableDeclarationStatement const& _statement)
 	else
 		valueTypes = TypePointers{type(*_statement.initialValue())};
 
-	// Determine which component is assigned to which variable.
-	// If numbers do not match, fill up if variables begin or end empty (not both).
-	vector<VariableDeclaration const*>& assignments = _statement.annotation().assignments;
-	assignments.resize(valueTypes.size(), nullptr);
 	vector<ASTPointer<VariableDeclaration>> const& variables = _statement.declarations();
 	if (variables.empty())
-	{
-		if (!valueTypes.empty())
-			m_errorReporter.fatalTypeError(
-				_statement.location(),
-				"Too many components (" +
-				toString(valueTypes.size()) +
-				") in value for variable assignment (0) needed"
-			);
-	}
+		// This should only be possible for the legacy ``var () = ...`` case.
+		m_errorReporter.typeError(
+			_statement.location(),
+			"Variable declaration statement does not declare any variables."
+		);
 	else if (valueTypes.size() != variables.size())
-	{
-		if (v050)
-			m_errorReporter.fatalTypeError(
-				_statement.location(),
-				"Different number of components on the left hand side (" +
-				toString(variables.size()) +
-				") than on the right hand side (" +
-				toString(valueTypes.size()) +
-				")."
-			);
-		else if (!variables.front() && !variables.back())
-			m_errorReporter.fatalTypeError(
-				_statement.location(),
-				"Wildcard both at beginning and end of variable declaration list is only allowed "
-				"if the number of components is equal."
-			);
-		else
-			m_errorReporter.warning(
-				_statement.location(),
-				"Different number of components on the left hand side (" +
-				toString(variables.size()) +
-				") than on the right hand side (" +
-				toString(valueTypes.size()) +
-				")."
-			);
-	}
-	size_t minNumValues = variables.size();
-	if (!variables.empty() && (!variables.back() || !variables.front()))
-		--minNumValues;
-	if (valueTypes.size() < minNumValues)
-		m_errorReporter.fatalTypeError(
+		m_errorReporter.typeError(
 			_statement.location(),
-			"Not enough components (" +
+			"Different number of components on the left hand side (" +
+			toString(variables.size()) +
+			") than on the right hand side (" +
 			toString(valueTypes.size()) +
-			") in value to assign all variables (" +
-			toString(minNumValues) + ")."
+			")."
 		);
-	if (valueTypes.size() > variables.size() && variables.front() && variables.back())
-		m_errorReporter.fatalTypeError(
-			_statement.location(),
-			"Too many components (" +
-			toString(valueTypes.size()) +
-			") in value for variable assignment (" +
-			toString(minNumValues) +
-			" needed)."
-		);
-	bool fillRight = !variables.empty() && (!variables.back() || variables.front());
-	for (size_t i = 0; i < min(variables.size(), valueTypes.size()); ++i)
-		if (fillRight)
-			assignments[i] = variables[i].get();
-		else
-			assignments[assignments.size() - i - 1] = variables[variables.size() - i - 1].get();
 
-	for (size_t i = 0; i < assignments.size(); ++i)
+	for (size_t i = 0; i < min(variables.size(), valueTypes.size()); ++i)
 	{
-		if (!assignments[i])
+		if (!variables[i])
 			continue;
-		VariableDeclaration const& var = *assignments[i];
+		VariableDeclaration const& var = *variables[i];
 		solAssert(!var.value(), "Value has to be tied to statement.");
 		TypePointer const& valueComponentType = valueTypes[i];
 		solAssert(!!valueComponentType, "");
