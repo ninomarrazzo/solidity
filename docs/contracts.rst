@@ -464,7 +464,7 @@ The following statements are considered modifying the state:
 
 ::
 
-    pragma solidity ^0.4.16;
+    pragma solidity >0.4.24;
 
     contract C {
         function f(uint a, uint b) public view returns (uint) {
@@ -479,11 +479,11 @@ The following statements are considered modifying the state:
   Getter methods are marked ``view``.
 
 .. note::
-  If invalid explicit type conversions are used, state modifications are possible
-  even though a ``view`` function was called.
-  You can switch the compiler to use ``STATICCALL`` when calling such functions and thus
-  prevent modifications to the state on the level of the EVM by adding
-  ``pragma experimental "v0.5.0";``
+  Before version 0.5.0 the compiler did not enforce the use of ``STATICCALL``
+  for ``view`` functions, and if invalid explicit type conversions were used,
+  state modifications were possible even though a ``view`` function was called.
+  By enforcing ``STATICCALL`` for ``view`` functions, modifications to the
+  state are prevented on the level of the EVM.
 
 .. index:: ! pure function, function;pure
 
@@ -504,7 +504,7 @@ In addition to the list of state modifying statements explained above, the follo
 
 ::
 
-    pragma solidity ^0.4.16;
+    pragma solidity >0.4.24;
 
     contract C {
         function f(uint a, uint b) public pure returns (uint) {
@@ -513,11 +513,11 @@ In addition to the list of state modifying statements explained above, the follo
     }
 
 .. note::
-  If invalid explicit type conversions are used, state modifications are possible
-  even though a ``pure`` function was called.
-  You can switch the compiler to use ``STATICCALL`` when calling such functions and thus
-  prevent modifications to the state on the level of the EVM by adding
-  ``pragma experimental "v0.5.0";``
+  Before version 0.5.0 the compiler did not enforce the use of ``STATICCALL``
+  for ``pure`` functions, and if invalid explicit type conversions were used,
+  state modifications were possible even though a ``pure`` function was called.
+  By enforcing ``STATICCALL`` for ``pure`` functions, modifications to the
+  state are prevented on the level of the EVM.
 
 .. warning::
   It is not possible to prevent functions from reading the state at the level
