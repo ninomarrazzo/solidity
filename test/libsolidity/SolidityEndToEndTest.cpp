@@ -12430,7 +12430,7 @@ BOOST_AUTO_TEST_CASE(senders_balance)
 	BOOST_CHECK(callContractFunction("f()") == encodeArgs(u256(27)));
 }
 
-BOOST_AUTO_TEST_CASE(write_storage)
+BOOST_AUTO_TEST_CASE(write_storage_external)
 {
 	char const* sourceCode = R"(
 		contract C {
