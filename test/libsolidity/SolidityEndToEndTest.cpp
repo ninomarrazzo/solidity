@@ -12430,6 +12430,43 @@ BOOST_AUTO_TEST_CASE(senders_balance)
 	BOOST_CHECK(callContractFunction("f()") == encodeArgs(u256(27)));
 }
 
+BOOST_AUTO_TEST_CASE(write_storage)
+{
+	char const* sourceCode = R"(
+		contract C {
+			uint public x;
+			function f(uint y) public payable {
+				x = y;
+			}
+			function g(uint y) external {
+				x = y;
+			}
+			function h() public {
+				this.g(12);
+			}
+		}
+		contract D {
+			C c = new C();
+			function f() public payable returns (uint) {
+				c.g(3);
+				return c.x();
+			}
+			function g() public returns (uint) {
+				c.g(8);
+				return c.x();
+			}
+			function h() public returns (uint) {
+				c.h();
+				return c.x();
+			}
+		}
+	)";
+	compileAndRun(sourceCode, 0, "D");
+	ABI_CHECK(callContractFunction("f()"), encodeArgs(3));
+	ABI_CHECK(callContractFunction("g()"), encodeArgs(8));
+	ABI_CHECK(callContractFunction("h()"), encodeArgs(12));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 }
