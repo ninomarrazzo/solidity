@@ -181,7 +181,7 @@ For more information, see the section on :ref:`address`.
     Use a pattern where the recipient withdraws the money.
 
 .. note::
-   Prior to version 0.5.0 Solidity allowed address members to be accessed by a contract instance, for example ``this.balance``.
+   Prior to version 0.5.0, Solidity allowed address members to be accessed by a contract instance, for example ``this.balance``.
    This is now forbidden and an explicit conversion to address must be done: ``address(this).balance``.
 
 .. note::
