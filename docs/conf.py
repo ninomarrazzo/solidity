@@ -18,6 +18,10 @@ import os
 import re
 docs_italia_theme = __import__("docs_italia_theme")
 
+from recommonmark.transform import AutoStructify
+from recommonmark.parser import CommonMarkParser
+
+
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
