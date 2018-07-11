@@ -37,7 +37,9 @@ def setup(sphinx):
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+extensions = [
+    'docs_italia_theme'
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -114,15 +116,21 @@ highlight_language = 'Solidity'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_rtd_theme'
+# html_theme = 'sphinx_rtd_theme'
+html_theme = 'docs_italia_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+    # This option can be used with docs-italia-theme to customise how the versions "badge" is shown:
+    # 'False': default (alabaster) badge | 'True': custom (italia) badge
+    'custom_versions_badge': 'True',
+    'collapse_navigation': 'True',
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+html_theme_path = [docs_italia_theme.get_html_theme_path()]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
